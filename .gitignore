@@ -1,0 +1,16 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+.ipynb_checkpoints/
+raw/
+metadata/
+synthetic_outputs/
+maps2d/**/maps.npy
+maps2d/**/labels.npy
+maps2d/**/simulation_ids.npy
+maps2d/**/map_ids.npy
+maps2d/**/manifest.json
+powerspectrum/**/*.npy
+powerspectrum/**/manifest.json
+*.download
+*.partial/
