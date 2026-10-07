@@ -2,6 +2,14 @@
 
 This repository prepares data for the CSCI 494 project "Inferring Cosmological Parameters from Simulated Matter Density Fields with Convolutional Neural Networks". The current scope is data extraction, validation, simulation-grouped splits, and matching 2D power spectra. It does not train Ridge, MLP, or CNN models.
 
+## About the branches
+ Here each collaborators contribute in their own branches according to their part of the task.
+- Meirzhan on ridge-regression branch
+- Darkhan on mlp branch
+- Danial on cnn1 branch
+- Alen on cnn2 branch
+- Eradil on augmentation branch
+
 ## Source
 
 Default source: CAMELS Multifield Dataset, `Maps_Mtot_IllustrisTNG_LH_z=0.00.npy` plus `params_LH_IllustrisTNG.txt`.
