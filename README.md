@@ -3,12 +3,14 @@
 This repository prepares data for the CSCI 494 project "Inferring Cosmological Parameters from Simulated Matter Density Fields with Convolutional Neural Networks". The current scope is data extraction, validation, simulation-grouped splits, and matching 2D power spectra. It does not train Ridge, MLP, or CNN models.
 
 ## About the branches
- Here each collaborators contribute in their own branches according to their part of the task.
+
+Here each collaborators contribute in their own branches according to their part of the task.
+
 - Meirzhan on ridge-regression branch
 - Darkhan on mlp branch
 - Danial on cnn1 branch
 - Alen on cnn2 branch
-- Eradil on augmentation branch
+- Yeradil on augmentation branch
 
 ## Source
 
@@ -66,17 +68,31 @@ Run tests:
 
 ```bash
 pytest
+
+python -m pytest augment/test_augmentation.py
+```
+
+Generate Weak Noise Data (alpha = 0.01):
+
+```bash
+python -m augment.generate --alpha 0.01
+```
+
+Generate Moderate Noise Data (alpha = 0.05):
+
+```bash
+python -m augment.generate --alpha 0.05
 ```
 
 ## Split Contract
 
 The original README requested 1,000 / 5,000 / 9,000 maps. That cannot be done without splitting a simulation because each LH simulation contributes exactly 15 related maps. This implementation preserves complete simulations and uses:
 
-| Level | Simulations | Maps | Test simulations | Fold simulations |
-|---|---:|---:|---:|---|
-| level1 | 67 | 1,005 | 13 | 11, 11, 11, 11, 10 |
-| level2 | 333 | 4,995 | 67 | 54, 53, 53, 53, 53 |
-| level3 | 600 | 9,000 | 120 | 96, 96, 96, 96, 96 |
+| Level  | Simulations |  Maps | Test simulations | Fold simulations   |
+| ------ | ----------: | ----: | ---------------: | ------------------ |
+| level1 |          67 | 1,005 |               13 | 11, 11, 11, 11, 10 |
+| level2 |         333 | 4,995 |               67 | 54, 53, 53, 53, 53 |
+| level3 |         600 | 9,000 |              120 | 96, 96, 96, 96, 96 |
 
 Splits are by simulation, never by individual map. A simulation appears in exactly one level and one group. Folds are development partitions: train on four folds and validate on one. Test groups are held out from tuning.
 
