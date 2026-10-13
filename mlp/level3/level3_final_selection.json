@@ -1,0 +1,26 @@
+{
+  "level": 3,
+  "configuration_name": "larger",
+  "settings": {
+    "learning_rate": 0.001,
+    "batch_size": 64,
+    "epochs": 12,
+    "seed": 42,
+    "shuffle_seed": 42,
+    "hidden_dims": [
+      64,
+      32
+    ],
+    "weight_decay": 0.0001
+  },
+  "development_best_epochs": [
+    12,
+    16,
+    9,
+    4,
+    17
+  ],
+  "epoch_selection": "median best epoch from five development folds",
+  "selection_criterion": "mean pooled simulation RMSE / pooled baseline RMSE across the two targets",
+  "comparison_sha256": "10c03470419e559b7d05c58edccdcdcafaffadcd5aa184a98a56c30183b9da54"
+}

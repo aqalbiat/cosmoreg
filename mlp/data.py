@@ -60,6 +60,22 @@ def load_train_validation(spectra_root, level, validation_fold):
 
     return X_train, y_train, id_train, X_val, y_val, id_val
 
+def load_development(spectra_root, level):
+    """Join all five development folds without loading the test group."""
+    if level not in (1, 2, 3):
+        raise ValueError("level must be 1, 2, or 3.")
+    parts = []
+    seen_ids = set()
+    for fold in range(1, 6):
+        X, y, ids = load_fold(spectra_root, level, fold)
+        current_ids = set(np.unique(ids).tolist())
+        if seen_ids.intersection(current_ids):
+            raise ValueError("Simulation IDs overlap across development folds.")
+        seen_ids.update(current_ids)
+        parts.append((X, y, ids))
+    return tuple(np.concatenate([part[i] for part in parts], axis=0) for i in range(3))
+
+
 def fit_feature_scaler(X_train):
     feature_mean = X_train.mean(axis=0)
 

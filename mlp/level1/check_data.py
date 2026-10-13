@@ -1,6 +1,6 @@
-"""Run with: python -m mlp.check_data
+"""Run with: python -m mlp.level1.check_data
 
-Use python -i -m mlp.check_data to keep the variables available in a
+Use python -i -m mlp.level1.check_data to keep the variables available in a
 Python console afterward. Sections execute top to bottom, like notebook cells.
 """
 
@@ -14,7 +14,7 @@ import torch
 
 from mlp import data
 
-SPECTRA_ROOT = Path(__file__).resolve().parents[1] / "powerspectrum"
+SPECTRA_ROOT = Path(__file__).resolve().parents[2] / "powerspectrum"
 LEVEL = 1
 VALIDATION_FOLD = 5
 
@@ -336,7 +336,7 @@ ax.set_ylabel("Standardized-target MSE")
 ax.set_title("MLP learning curves")
 ax.legend()
 
-figure_path = Path(__file__).resolve().parents[1] / "mlp_learning_curves.png"
+figure_path = Path(__file__).resolve().parent / "mlp_learning_curves.png"
 fig.savefig(figure_path, dpi=150, bbox_inches="tight")
 plt.close(fig)
 
