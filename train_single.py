@@ -75,7 +75,7 @@ def get_device():
 
 
 # Training
-def train_one_model(model_name, level=1, epochs=25, lr=3e-4, results_file=None, save=True):
+def train_one_model(model_name, level=1, epochs=25, lr=3e-4, results_file=None, save=True, data_root="maps2d"):
     """Train one model on one level and return its best validation MSE.
 
     results_file: JSON file the score is written to. Defaults to the shared
@@ -90,10 +90,11 @@ def train_one_model(model_name, level=1, epochs=25, lr=3e-4, results_file=None, 
     device = get_device()
     print("\n==========================================")
     print(f"Training: {model_name} on Level {level} using {device}")
+    print(f"Data Root: {data_root}")
     print("==========================================")
 
     # Load Data
-    X_train, Y_train, X_val, Y_val = load_level_data(level=level, val_fold=5)
+    X_train, Y_train, X_val, Y_val = load_level_data(level=level, val_fold=5, root=data_root)
 
     train_loader = DataLoader(
         TensorDataset(torch.tensor(X_train, dtype=torch.float32), torch.tensor(Y_train, dtype=torch.float32)),
@@ -192,7 +193,8 @@ if __name__ == "__main__":
                         help="JSON file for the score (default: results_level{level}.json)")
     parser.add_argument("--no-save", action="store_true",
                         help="Do not write weights or scores (for timing or test runs)")
+    parser.add_argument("--data-root", type=str, default="maps2d", help="Folder containing the data")
     args = parser.parse_args()
 
     train_one_model(args.model, level=args.level, epochs=args.epochs,
-                    results_file=args.results_file, save=not args.no_save)
+                    results_file=args.results_file, save=not args.no_save, data_root=args.data_root)

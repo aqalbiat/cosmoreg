@@ -30,12 +30,12 @@ def _load_leaf(root, level, group, data_file):
     return dataset, labels
 
 
-def Get2dMapTrainFold(level, fold):
-    return _load_leaf("maps2d", level, _fold_name(fold), "maps.npy")
+def Get2dMapTrainFold(level, fold, root="maps2d"):
+    return _load_leaf(root, level, _fold_name(fold), "maps.npy")
 
 
-def Get2dMapTestData(level):
-    return _load_leaf("maps2d", level, "test", "maps.npy")
+def Get2dMapTestData(level, root="maps2d"):
+    return _load_leaf(root, level, "test", "maps.npy")
 
 
 def GetSpectrumTrainFold(level, fold):
