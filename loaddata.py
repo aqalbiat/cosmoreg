@@ -1,7 +1,7 @@
 import numpy as np
 from fetch import Get2dMapTrainFold, Get2dMapTestData
 
-def load_level_data(level, val_fold=5):
+def load_level_data(level, val_fold=5, root="maps2d"):
     """
     Loads all 5 folds for a given level using fetch.py.
     Combines 4 folds for training and keeps 1 for validation.
@@ -12,11 +12,11 @@ def load_level_data(level, val_fold=5):
     X_val = None
     Y_val = None
     
-    print(f"Loading data for Level {level} (Validation on Fold {val_fold})...")
+    print(f"Loading data for Level {level} from '{root}' (Validation on Fold {val_fold})...")
     
     for fold in range(1, 6):
         # 1. Fetch data from memory map
-        X, Y = Get2dMapTrainFold(level, fold)
+        X, Y = Get2dMapTrainFold(level, fold, root=root)
         
         # 2. Convert to standard numpy arrays (loads into RAM)
         X = np.array(X, dtype=np.float32) 
