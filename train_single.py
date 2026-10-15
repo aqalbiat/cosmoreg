@@ -75,7 +75,7 @@ def get_device():
 
 
 # Training
-def train_one_model(model_name, level=1, epochs=25, lr=3e-4, results_file=None, save=True, data_root="maps2d"):
+def train_one_model(model_name, level=1, epochs=25, lr=3e-4, results_file=None, save=True, data_root="maps2d", weight_prefix=""):
     """Train one model on one level and return its best validation MSE.
 
     results_file: JSON file the score is written to. Defaults to the shared
@@ -112,7 +112,7 @@ def train_one_model(model_name, level=1, epochs=25, lr=3e-4, results_file=None, 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs, eta_min=1e-5)
 
     # always holds the best epoch.
-    weights_path = f"checkpoints/{model_name}_level{level}.pth"
+    weights_path = f"checkpoints/{weight_prefix}{model_name}_level{level}.pth"
     if save:
         os.makedirs("checkpoints", exist_ok=True)
 
