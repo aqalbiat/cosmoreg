@@ -33,7 +33,8 @@ import traceback
 from loaddata import load_level_data
 from train_single import MODEL_REGISTRY, train_one_model
 
-DEFAULT_DEPTHS = [4, 6, 8, 10]
+#DEFAULT_DEPTHS = [4, 6, 8, 10]
+DEFAULT_DEPTHS = [12, 14, 16]
 DEFAULT_TAG = "danial"
 
 
