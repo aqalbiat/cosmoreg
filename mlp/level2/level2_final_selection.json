@@ -1,0 +1,26 @@
+{
+  "level": 2,
+  "configuration_name": "stronger_decay",
+  "settings": {
+    "learning_rate": 0.001,
+    "batch_size": 64,
+    "epochs": 13,
+    "seed": 42,
+    "shuffle_seed": 42,
+    "hidden_dims": [
+      32,
+      16
+    ],
+    "weight_decay": 0.01
+  },
+  "development_best_epochs": [
+    13,
+    13,
+    19,
+    11,
+    13
+  ],
+  "epoch_selection": "median best epoch from five development folds",
+  "selection_criterion": "mean pooled simulation RMSE / pooled baseline RMSE across the two targets",
+  "comparison_sha256": "2ee31535b94db34e56add4fec024eb2bd9316a5f9f2403849517b723369044b6"
+}

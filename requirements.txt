@@ -4,3 +4,4 @@ requests>=2.31
 pytest>=8.0
 matplotlib>=3.7
 jupyter>=1.0
+torch>=2.9

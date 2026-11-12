@@ -1,0 +1,69 @@
+<div id="cv-to-test">
+  <label class="form-label" for="cv-stage">Experiment stage</label>
+  <select class="form-select" id="cv-stage">
+    <option value="1">Cross-validation: hold out fold 1</option>
+    <option value="2">Cross-validation: hold out fold 2</option>
+    <option value="3">Cross-validation: hold out fold 3</option>
+    <option value="4">Cross-validation: hold out fold 4</option>
+    <option value="5">Cross-validation: hold out fold 5</option>
+    <option value="train">Final model: train on all development folds</option>
+    <option value="test">Final model: evaluate on the test set</option>
+  </select>
+  <div class="cv-marks" role="group" aria-label="Five development folds">
+    <div class="cv-mark" data-fold="1"><span>Fold 1</span><span class="cv-role"></span></div>
+    <div class="cv-mark" data-fold="2"><span>Fold 2</span><span class="cv-role"></span></div>
+    <div class="cv-mark" data-fold="3"><span>Fold 3</span><span class="cv-role"></span></div>
+    <div class="cv-mark" data-fold="4"><span>Fold 4</span><span class="cv-role"></span></div>
+    <div class="cv-mark" data-fold="5"><span>Fold 5</span><span class="cv-role"></span></div>
+  </div>
+  <div class="cv-test" id="cv-test-role"></div>
+  <p class="tabular-nums" id="cv-counts" aria-live="polite"></p>
+  <div id="cv-model-role"></div>
+</div>
+<style>
+#cv-to-test .cv-marks {display:flex; gap:6px; margin-block:16px; flex-wrap:wrap;}
+#cv-to-test .cv-mark {flex:1 1 52px; display:flex; flex-direction:column; align-items:center; gap:8px; padding-block:14px; background:color-mix(in srgb,var(--viz-series-1) 18%,transparent); color:var(--foreground);}
+#cv-to-test .cv-mark[data-role="Validate"] {background:color-mix(in srgb,var(--viz-series-2) 22%,transparent);}
+#cv-to-test .cv-mark[data-role="Used"] {background:var(--muted); color:var(--muted-foreground);}
+#cv-to-test .cv-test {padding-block:10px; color:var(--foreground); background:var(--muted); text-align:center;}
+#cv-to-test .cv-test[data-active="true"] {background:color-mix(in srgb,var(--viz-series-2) 22%,transparent);}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('cv-to-test');
+  const select = root.querySelector('#cv-stage');
+  const counts = [11,11,11,11,10];
+  function draw(stage) {
+    const cv = /^[1-5]$/.test(stage);
+    const index = cv ? Number(stage)-1 : -1;
+    root.querySelectorAll('[data-fold]').forEach((mark,i) => {
+      const role = cv ? (i===index ? 'Validate' : 'Train') : stage==='train' ? 'Train' : 'Used';
+      mark.dataset.role = role;
+      mark.querySelector('.cv-role').textContent = role;
+      mark.setAttribute('aria-label', `Fold ${i+1}: ${counts[i]} simulations, ${role}`);
+    });
+    const test = root.querySelector('#cv-test-role');
+    test.dataset.active = String(stage==='test');
+    test.textContent = stage==='test' ? 'Test set: evaluate frozen model' : 'Test set: untouched';
+    const n = cv ? counts[index] : 0;
+    root.querySelector('#cv-counts').textContent = cv
+      ? `Training: ${54-n} simulations / ${(54-n)*15} maps · Validation: ${n} simulations / ${n*15} maps`
+      : stage==='train' ? 'Training: 54 simulations / 810 maps · Test data used: 0'
+      : 'Evaluation: 13 test simulations / 195 maps · Parameter updates: 0';
+    root.querySelector('#cv-model-role').textContent = cv
+      ? `Fresh model ${stage}: new weights, optimizer, and training-fitted scalers`
+      : stage==='train' ? 'One fresh final model · Fixed settings and epoch count · New development-fitted scalers'
+      : 'Saved final weights and development-fitted scalers · Original-unit errors';
+  }
+  select.addEventListener('change', () => {
+    draw(select.value);
+    if (window.openai && window.openai.setWidgetState) {
+      window.openai.setWidgetState({modelContent:{stage:select.value},privateContent:null}).catch(() => {});
+    }
+  });
+  const saved = window.openai && window.openai.widgetState;
+  const stage = saved && saved.modelContent && saved.modelContent.stage;
+  if (['1','2','3','4','5','train','test'].includes(stage)) select.value=stage;
+  draw(select.value);
+})();
+</script>
