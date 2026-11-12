@@ -1,0 +1,305 @@
+[
+  {
+    "cell": 0,
+    "cell_type": "markdown",
+    "source": [
+      "# Level 1: final test evaluation\n",
+      "\n",
+      "Evaluate the fixed `50 -> 64 -> 32 -> 2` model trained on all 54 development simulations for 11 epochs, with seed 42. The training settings and duration were chosen before test evaluation.\n",
+      "\n",
+      "**Test group:** 13 simulations, 195 maps. Apply the saved development-fitted scalers; never fit preprocessing on test data. Evaluation uses `model.eval()` and `torch.no_grad()` with no optimizer or parameter updates. Compare against the constant saved development target means.\n",
+      "\n",
+      "Map-level metrics count individual maps. Simulation-level metrics average the 15 predictions within each simulation before computing errors across simulations. Arrays follow `[Omega_m, sigma_8]`; all RMSE/MAE values are in original units.\n",
+      "\n",
+      "Run with `.venv/bin/python` after restarting the kernel when modules change. Rerunning this notebook reproduces the same fixed-checkpoint evaluation. Use these scores to report the final model, not to choose new settings on this same test set. The 13 simulations are a small independent evaluation sample.\n"
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 1,
+    "cell_type": "markdown",
+    "source": [
+      "## 1. Locate the project and output files\n",
+      "\n",
+      "All level-1 evaluation artifacts stay under `mlp/level1/`. Shared evaluation code lives in `mlp/evaluate.py`."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 2,
+    "cell_type": "code",
+    "source": [
+      "from pathlib import Path\n",
+      "from hashlib import sha256\n",
+      "import sys\n",
+      "import json\n",
+      "\n",
+      "PROJECT_ROOT=next(\n",
+      "    (p for p in (Path.cwd(), *Path.cwd().parents)\n",
+      "     if (p / \"mlp\" / \"data.py\").is_file()), None,\n",
+      ")\n",
+      "if PROJECT_ROOT is None:\n",
+      "    raise RuntimeError(\"Open the notebook inside the cosmoreg project.\")\n",
+      "if str(PROJECT_ROOT) not in sys.path:\n",
+      "    sys.path.insert(0,str(PROJECT_ROOT))\n",
+      "\n",
+      "import numpy as np\n",
+      "from mlp.final_train import load_final_model\n",
+      "from mlp.evaluate import evaluate_test_model\n",
+      "\n",
+      "LEVEL_ROOT=PROJECT_ROOT / \"mlp\" / \"level1\"\n",
+      "SPECTRA_ROOT=PROJECT_ROOT / \"powerspectrum\"\n",
+      "CHECKPOINT_PATH=LEVEL_ROOT / \"checkpoints\" / \"level1_larger_seed42_epochs11.pt\"\n",
+      "RESULTS_PATH=LEVEL_ROOT / \"level1_test_results.json\"\n",
+      "FIGURE_PATH=LEVEL_ROOT / \"level1_test_predictions.png\"\n",
+      "print(\"Checkpoint:\",CHECKPOINT_PATH)\n"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "Checkpoint: /home/meatpigeon/Personal/classes/csci494/cosmoreg/mlp/level1/checkpoints/level1_larger_seed42_epochs11.pt\n"
+        ],
+        "data": {}
+      }
+    ]
+  },
+  {
+    "cell": 3,
+    "cell_type": "markdown",
+    "source": [
+      "## 2. Verify the frozen model's identity before evaluation\n",
+      "\n",
+      "Inspect saved settings and record the checkpoint hash. The hash ties the report to the exact saved weights and preprocessing. This cell does not load test arrays."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 4,
+    "cell_type": "code",
+    "source": [
+      "saved=load_final_model(CHECKPOINT_PATH)\n",
+      "assert saved[\"settings\"][\"level\"]==1\n",
+      "assert saved[\"settings\"][\"hidden_dims\"]==[64,32]\n",
+      "assert saved[\"settings\"][\"epochs\"]==11\n",
+      "assert saved[\"settings\"][\"seed\"]==42\n",
+      "assert saved[\"training_maps\"]==810\n",
+      "assert len(saved[\"training_simulation_ids\"])==54\n",
+      "checkpoint_hash=sha256(CHECKPOINT_PATH.read_bytes()).hexdigest()\n",
+      "print(\"Architecture: 50 -> 64 -> 32 -> 2\")\n",
+      "print(\"Fixed duration:\",saved[\"settings\"][\"epochs\"],\"epochs\")\n",
+      "print(\"Training simulations:\",len(saved[\"training_simulation_ids\"]))\n",
+      "print(\"Checkpoint SHA-256:\",checkpoint_hash)\n"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "Architecture: 50 -> 64 -> 32 -> 2\n",
+          "Fixed duration: 11 epochs\n",
+          "Training simulations: 54\n",
+          "Checkpoint SHA-256: 3466f6807ebafe0ae6637504acc29b438776f325e62384f91c8d898062c84e47\n"
+        ],
+        "data": {}
+      }
+    ]
+  },
+  {
+    "cell": 5,
+    "cell_type": "markdown",
+    "source": [
+      "## 3. Evaluate the untouched test group\n",
+      "\n",
+      "The helper loads only the checkpoint's level-specific test arrays. It checks row counts, finite values, shared targets within simulations, and absence of overlap with saved training simulation IDs. It then applies saved scalers and makes predictions. Assertions verify that model weights and the checkpoint file stay unchanged."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 6,
+    "cell_type": "code",
+    "source": [
+      "test_results=evaluate_test_model(CHECKPOINT_PATH,SPECTRA_ROOT)\n",
+      "assert test_results[\"checkpoint_sha256\"]==checkpoint_hash\n",
+      "assert test_results[\"test_maps\"]==195\n",
+      "assert test_results[\"test_simulations\"]==13\n",
+      "assert test_results[\"simulation_predictions\"].shape==(13,2)\n",
+      "_,maps_per_simulation=np.unique(test_results[\"map_simulation_ids\"],return_counts=True)\n",
+      "assert np.all(maps_per_simulation==15)\n",
+      "assert np.all(test_results[\"simulation_metrics\"][\"rmse\"]<=test_results[\"map_metrics\"][\"rmse\"]+1e-6)\n",
+      "print(\"Evaluated\",test_results[\"test_maps\"],\"maps from\",test_results[\"test_simulations\"],\"test simulations.\")\n",
+      "print(\"Standardized-target test MSE:\",test_results[\"test_loss\"])\n",
+      "print(\"Standardized-target baseline MSE:\",test_results[\"baseline_loss\"])\n",
+      "print(\"No training or scaler fitting performed.\")\n"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "Evaluated 195 maps from 13 test simulations.\n",
+          "Standardized-target test MSE: 1.1786668300628662\n",
+          "Standardized-target baseline MSE: 1.4539860486984253\n",
+          "No training or scaler fitting performed.\n"
+        ],
+        "data": {}
+      }
+    ]
+  },
+  {
+    "cell": 7,
+    "cell_type": "markdown",
+    "source": [
+      "## 4. Report errors against the development-mean baseline\n",
+      "\n",
+      "```text\n",
+      "RMSE = sqrt(mean((prediction - target)**2))\n",
+      "MAE  = mean(abs(prediction - target))\n",
+      "RMSE reduction (%) = 100 * (1 - MLP_RMSE / baseline_RMSE)\n",
+      "```\n",
+      "\n",
+      "Positive reduction means improvement. Inspect both targets and both metrics; RMSE improvement does not necessarily imply MAE improvement. The baseline means come from development training, not test targets."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 8,
+    "cell_type": "code",
+    "source": [
+      "for group,key in ((\"Map-level\",\"map_metrics\"),(\"Simulation-level\",\"simulation_metrics\")):\n",
+      "    metrics=test_results[key]\n",
+      "    print(f\"\\n{group} final test results (original units)\")\n",
+      "    print(\"Target     MLP RMSE  Base RMSE  MLP MAE  Base MAE  RMSE reduction\")\n",
+      "    for i,target in enumerate(test_results[\"target_names\"]):\n",
+      "        baseline=metrics[\"baseline_rmse\"][i]\n",
+      "        reduction=100*(1-metrics[\"rmse\"][i]/baseline) if baseline>0 else float(\"nan\")\n",
+      "        print(f\"{target:9s}  {metrics['rmse'][i]:.4f}    {baseline:.4f}     {metrics['mae'][i]:.4f}   {metrics['baseline_mae'][i]:.4f}    {reduction:7.1f}%\")\n"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "\n",
+          "Map-level final test results (original units)\n",
+          "Target     MLP RMSE  Base RMSE  MLP MAE  Base MAE  RMSE reduction\n",
+          "Omega_m    0.1259    0.1500     0.1092   0.1447       16.0%\n",
+          "sigma_8    0.1083    0.1054     0.0939   0.0861       -2.7%\n",
+          "\n",
+          "Simulation-level final test results (original units)\n",
+          "Target     MLP RMSE  Base RMSE  MLP MAE  Base MAE  RMSE reduction\n",
+          "Omega_m    0.1203    0.1500     0.1078   0.1447       19.8%\n",
+          "sigma_8    0.1017    0.1054     0.0891   0.0861        3.5%\n"
+        ],
+        "data": {}
+      }
+    ]
+  },
+  {
+    "cell": 9,
+    "cell_type": "markdown",
+    "source": [
+      "## 5. Inspect simulation predictions versus true targets\n",
+      "\n",
+      "Each circle is one test simulation, after averaging its 15 map predictions. Crosses show the constant development-mean baseline. The diagonal represents perfect prediction. Shared x/y limits make the distances from that line interpretable."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 10,
+    "cell_type": "code",
+    "source": [
+      "import matplotlib.pyplot as plt\n",
+      "\n",
+      "fig,axes=plt.subplots(1,2,figsize=(9,4))\n",
+      "for i,(ax,target) in enumerate(zip(axes,test_results[\"target_names\"])):\n",
+      "    truth=test_results[\"simulation_targets\"][:,i]\n",
+      "    prediction=test_results[\"simulation_predictions\"][:,i]\n",
+      "    baseline=np.full_like(truth,test_results[\"baseline_target_mean\"][i])\n",
+      "    values=np.concatenate([truth,prediction,baseline])\n",
+      "    span=float(np.ptp(values))\n",
+      "    margin=0.08*span if span>0 else 0.01\n",
+      "    limits=(float(values.min()-margin),float(values.max()+margin))\n",
+      "    ax.scatter(truth,prediction,label=\"MLP\",s=35)\n",
+      "    ax.scatter(truth,baseline,label=\"Development-mean baseline\",marker=\"x\",s=35)\n",
+      "    ax.plot(limits,limits,linestyle=\"--\",color=\"gray\",label=\"Perfect prediction\")\n",
+      "    ax.set_xlim(limits)\n",
+      "    ax.set_ylim(limits)\n",
+      "    ax.set_aspect(\"equal\",adjustable=\"box\")\n",
+      "    ax.set_xlabel(f\"True {target}\")\n",
+      "    ax.set_ylabel(f\"Predicted {target}\")\n",
+      "    ax.set_title(target)\n",
+      "axes[0].legend(fontsize=8)\n",
+      "fig.suptitle(\"Level 1 final test: 13 simulations\")\n",
+      "fig.tight_layout()\n",
+      "fig.savefig(FIGURE_PATH,dpi=150,bbox_inches=\"tight\")\n",
+      "plt.show()\n",
+      "plt.close(fig)\n",
+      "print(\"Saved:\",FIGURE_PATH)\n"
+    ],
+    "outputs": [
+      {
+        "metadata": {},
+        "output_type": "display_data",
+        "data": {
+          "text/plain": [
+            "<Figure: final test predictions>"
+          ]
+        }
+      },
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "Saved: /home/meatpigeon/Personal/classes/csci494/cosmoreg/mlp/level1/level1_test_predictions.png\n"
+        ],
+        "data": {}
+      }
+    ]
+  },
+  {
+    "cell": 11,
+    "cell_type": "markdown",
+    "source": [
+      "## 6. Save the final test report\n",
+      "\n",
+      "Record model identity, settings, original-unit predictions and targets, metrics, and the baseline means. Keeping per-simulation predictions makes the reported errors independently checkable. The checkpoint file remains unchanged."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 12,
+    "cell_type": "code",
+    "source": [
+      "def json_value(value):\n",
+      "    if isinstance(value,np.ndarray):\n",
+      "        return value.tolist()\n",
+      "    if isinstance(value,np.generic):\n",
+      "        return value.item()\n",
+      "    raise TypeError(f\"Cannot serialize {type(value).__name__}\")\n",
+      "\n",
+      "report={\n",
+      "    \"evaluation_date\":\"2026-10-12\",\n",
+      "    \"checkpoint\":\"mlp/level1/checkpoints/level1_larger_seed42_epochs11.pt\",\n",
+      "    \"evaluation_group\":\"test\",\n",
+      "    **test_results,\n",
+      "}\n",
+      "RESULTS_PATH.write_text(json.dumps(report,default=json_value,indent=2,allow_nan=False)+\"\\n\")\n",
+      "assert sha256(CHECKPOINT_PATH.read_bytes()).hexdigest()==checkpoint_hash\n",
+      "print(\"Saved:\",RESULTS_PATH)\n",
+      "print(\"Final test evaluation complete. Checkpoint unchanged.\")\n"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "Saved: /home/meatpigeon/Personal/classes/csci494/cosmoreg/mlp/level1/level1_test_results.json\n",
+          "Final test evaluation complete. Checkpoint unchanged.\n"
+        ],
+        "data": {}
+      }
+    ]
+  }
+]

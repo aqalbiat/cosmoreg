@@ -1,0 +1,416 @@
+[
+  {
+    "cell": 0,
+    "cell_type": "markdown",
+    "source": [
+      "# Ridge regression \n",
+      "\n",
+      "**Pipeline:** `log10(P(k))` → standardize → Ridge regression\n",
+      "**Protocol:**\n",
+      "- For every level (1, 2, 3), the data is already split into 5 folds + a test set.\n",
+      "- α is chosen by 5-fold cross-validation: train on 4 folds, validate on the 5th, rotate.\n",
+      "- The final model is trained on all 5 folds and evaluated **once** on the test set.\n",
+      "- Metrics: MAE and RMSE, separately for Ωm and σ8, plus predicted-vs-true plots."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 1,
+    "cell_type": "code",
+    "source": [
+      "from pathlib import Path\n",
+      "import csv\n",
+      "\n",
+      "import numpy as np\n",
+      "import matplotlib.pyplot as plt\n",
+      "from sklearn.linear_model import Ridge\n",
+      "from sklearn.pipeline import make_pipeline\n",
+      "from sklearn.preprocessing import FunctionTransformer, StandardScaler\n",
+      "from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score\n",
+      "\n",
+      "import fetch\n",
+      "from fetch import GetSpectrumTrainFold, GetSpectrumTestData\n",
+      "\n",
+      "DATA_ROOT = Path(fetch.__file__).resolve().parent / \"powerspectrum\"\n",
+      "\n",
+      "LEVELS = [1, 2, 3]\n",
+      "N_FOLDS = 5\n",
+      "ALPHAS = np.logspace(-6, 4, 41)          # candidate regularization strengths\n",
+      "PARAM_NAMES = [\"Omega_m\", \"sigma_8\"]      # for files and printing\n",
+      "PARAM_TEX = [r\"$\\Omega_m$\", r\"$\\sigma_8$\"]  # for plot labels\n",
+      "\n",
+      "OUT_DIR = Path(\"results/ridge\")\n",
+      "OUT_DIR.mkdir(parents=True, exist_ok=True)"
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 2,
+    "cell_type": "markdown",
+    "source": [
+      "## 1. Load the data"
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 3,
+    "cell_type": "code",
+    "source": [
+      "def load_level(level):\n",
+      "    # Each 'fold' is one fifth of the non-test data. Together the 5 folds are the full training set.\n",
+      "    folds = []\n",
+      "    for k in range(1, N_FOLDS + 1):\n",
+      "        X, y = GetSpectrumTrainFold(level, k)\n",
+      "        folds.append((np.asarray(X, dtype=np.float64), np.asarray(y, dtype=np.float64)))\n",
+      "    X_test, y_test = GetSpectrumTestData(level)\n",
+      "    return folds, np.asarray(X_test, dtype=np.float64), np.asarray(y_test, dtype=np.float64)\n",
+      "\n",
+      "\n",
+      "data = {level: load_level(level) for level in LEVELS}"
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 4,
+    "cell_type": "markdown",
+    "source": [
+      "## 2. Sanity checks\n",
+      "\n",
+      "- `log10` needs every P(k) value to be positive.\n",
+      "- Several samples share the same cosmology (several maps per simulation). If the same cosmology appeared in both a training fold and the test set, the test score would be too optimistic, so we check that the splits share no cosmologies."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 5,
+    "cell_type": "code",
+    "source": [
+      "def cosmologies(y):\n",
+      "    return {tuple(np.round(row, 6)) for row in y}\n",
+      "\n",
+      "\n",
+      "for level, (folds, X_test, y_test) in data.items():\n",
+      "    X_all = np.concatenate([X for X, _ in folds] + [X_test])\n",
+      "    groups = [cosmologies(y) for _, y in folds] + [cosmologies(y_test)]\n",
+      "    names = [f\"fold{k}\" for k in range(1, N_FOLDS + 1)] + [\"test\"]\n",
+      "\n",
+      "    print(f\"Level {level}\")\n",
+      "    print(f\"  samples per fold: {[len(X) for X, _ in folds]}, test: {len(X_test)}, k-bins: {X_all.shape[1]}\")\n",
+      "    print(f\"  cosmologies per fold: {[len(g) for g in groups[:-1]]}, test: {len(groups[-1])}\")\n",
+      "    print(f\"  min P(k) = {X_all.min():.3g}   NaN present: {np.isnan(X_all).any()}\")\n",
+      "\n",
+      "    overlaps = [(names[i], names[j], len(groups[i] & groups[j]))\n",
+      "                for i in range(len(groups)) for j in range(i + 1, len(groups))\n",
+      "                if groups[i] & groups[j]]\n",
+      "    print(\"  cosmologies shared between splits:\", overlaps if overlaps else \"none (no leakage)\")\n",
+      "\n",
+      "    if X_all.min() <= 0:\n",
+      "        print(\"  WARNING: non-positive P(k) values, log10 will fail. Tell Aman.\")"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "Level 1\n",
+          "  samples per fold: [165, 165, 165, 165, 150], test: 195, k-bins: 50\n",
+          "  cosmologies per fold: [11, 11, 11, 11, 10], test: 13\n",
+          "  min P(k) = 0.00806   NaN present: False\n",
+          "  cosmologies shared between splits: none (no leakage)\n",
+          "Level 2\n",
+          "  samples per fold: [810, 795, 795, 795, 795], test: 1005, k-bins: 50\n",
+          "  cosmologies per fold: [54, 53, 53, 53, 53], test: 67\n",
+          "  min P(k) = 0.00613   NaN present: False\n",
+          "  cosmologies shared between splits: none (no leakage)\n",
+          "Level 3\n",
+          "  samples per fold: [1440, 1440, 1440, 1440, 1440], test: 1800, k-bins: 50\n",
+          "  cosmologies per fold: [96, 96, 96, 96, 96], test: 120\n",
+          "  min P(k) = 0.004   NaN present: False\n",
+          "  cosmologies shared between splits: none (no leakage)\n"
+        ],
+        "data": {}
+      }
+    ]
+  },
+  {
+    "cell": 6,
+    "cell_type": "markdown",
+    "source": [
+      "## 3. Model and cross-validation\n",
+      "\n",
+      "The `Pipeline` makes sure the scaler is fitted on the training folds only, so no information from the validation fold leaks in."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 7,
+    "cell_type": "code",
+    "source": [
+      "def make_model(alpha):\n",
+      "    # alpha can be one number or an array [alpha_Omega_m, alpha_sigma_8]\n",
+      "    return make_pipeline(\n",
+      "        FunctionTransformer(np.log10),\n",
+      "        StandardScaler(),\n",
+      "        Ridge(alpha=alpha),\n",
+      "    )\n",
+      "\n",
+      "\n",
+      "def cross_validate(folds, alphas):\n",
+      "    # Returns RMSE and MAE arrays of shape (n_folds, n_alphas, 2 parameters).\n",
+      "    rmse = np.zeros((len(folds), len(alphas), 2))\n",
+      "    mae = np.zeros_like(rmse)\n",
+      "    for k in range(len(folds)):\n",
+      "        X_val, y_val = folds[k]\n",
+      "        X_tr = np.concatenate([X for i, (X, _) in enumerate(folds) if i != k])\n",
+      "        y_tr = np.concatenate([y for i, (_, y) in enumerate(folds) if i != k])\n",
+      "        for a, alpha in enumerate(alphas):\n",
+      "            pred = make_model(alpha).fit(X_tr, y_tr).predict(X_val)\n",
+      "            rmse[k, a] = np.sqrt(((pred - y_val) ** 2).mean(axis=0))\n",
+      "            mae[k, a] = np.abs(pred - y_val).mean(axis=0)\n",
+      "    return rmse, mae\n",
+      "\n",
+      "\n",
+      "cv = {}\n",
+      "for level, (folds, _, _) in data.items():\n",
+      "    rmse, mae = cross_validate(folds, ALPHAS)\n",
+      "    best_idx = rmse.mean(axis=0).argmin(axis=0)   # best alpha index for each parameter\n",
+      "    cv[level] = dict(rmse=rmse, mae=mae, best_idx=best_idx, best_alpha=ALPHAS[best_idx])\n",
+      "\n",
+      "    print(f\"Level {level}\")\n",
+      "    for t, name in enumerate(PARAM_NAMES):\n",
+      "        i = best_idx[t]\n",
+      "        print(f\"  {name:8s} best alpha = {ALPHAS[i]:.3g}   \"\n",
+      "              f\"CV RMSE = {rmse[:, i, t].mean():.4f} ± {rmse[:, i, t].std():.4f}   \"\n",
+      "              f\"CV MAE = {mae[:, i, t].mean():.4f} ± {mae[:, i, t].std():.4f}\")\n",
+      "        if i in (0, len(ALPHAS) - 1):\n",
+      "            print(\"    WARNING: best alpha is at the edge of the grid, widen ALPHAS.\")"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "Level 1\n",
+          "  Omega_m  best alpha = 100   CV RMSE = 0.0953 ± 0.0157   CV MAE = 0.0816 ± 0.0171\n",
+          "  sigma_8  best alpha = 100   CV RMSE = 0.0977 ± 0.0170   CV MAE = 0.0826 ± 0.0155\n",
+          "Level 2\n",
+          "  Omega_m  best alpha = 100   CV RMSE = 0.0896 ± 0.0055   CV MAE = 0.0743 ± 0.0055\n",
+          "  sigma_8  best alpha = 178   CV RMSE = 0.0956 ± 0.0045   CV MAE = 0.0792 ± 0.0047\n",
+          "Level 3\n",
+          "  Omega_m  best alpha = 178   CV RMSE = 0.0919 ± 0.0034   CV MAE = 0.0755 ± 0.0027\n",
+          "  sigma_8  best alpha = 316   CV RMSE = 0.0989 ± 0.0043   CV MAE = 0.0832 ± 0.0031\n"
+        ],
+        "data": {}
+      }
+    ]
+  },
+  {
+    "cell": 8,
+    "cell_type": "code",
+    "source": [
+      "fig, axes = plt.subplots(1, 2, figsize=(11, 4))\n",
+      "for t, ax in enumerate(axes):\n",
+      "    for level in LEVELS:\n",
+      "        mean = cv[level][\"rmse\"][:, :, t].mean(axis=0)\n",
+      "        std = cv[level][\"rmse\"][:, :, t].std(axis=0)\n",
+      "        line, = ax.plot(ALPHAS, mean, label=f\"level {level}\")\n",
+      "        ax.fill_between(ALPHAS, mean - std, mean + std, alpha=0.2, color=line.get_color())\n",
+      "        ax.axvline(cv[level][\"best_alpha\"][t], ls=\"--\", lw=0.8, color=line.get_color())\n",
+      "    ax.set_xscale(\"log\")\n",
+      "    ax.set_xlabel(r\"Ridge $\\alpha$\")\n",
+      "    ax.set_ylabel(\"CV RMSE\")\n",
+      "    ax.set_title(f\"Cross-validation: {PARAM_TEX[t]}\")\n",
+      "    ax.legend()\n",
+      "plt.tight_layout()\n",
+      "plt.savefig(OUT_DIR / \"cv_curves.png\", dpi=150)\n",
+      "plt.show()"
+    ],
+    "outputs": [
+      {
+        "metadata": {},
+        "output_type": "display_data",
+        "data": {
+          "text/plain": [
+            "<Figure size 1100x400 with 2 Axes>"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "cell": 9,
+    "cell_type": "markdown",
+    "source": [
+      "## 4. Final evaluation on the test set\n",
+      "\n",
+      "Train on all 5 folds with the chosen α, then evaluate once on the test set. A trivial baseline that always predicts the training mean is included as a reference: Ridge must beat it to be learning anything.\n",
+      "\n",
+      "Metrics are reported two ways, matching the MLP branch:\n",
+      "- **per map**: every one of the 15 maps of a simulation is scored separately;\n",
+      "- **per simulation**: the 15 predictions of each simulation are averaged first, which removes much of the map-to-map noise."
+    ],
+    "outputs": []
+  },
+  {
+    "cell": 10,
+    "cell_type": "code",
+    "source": [
+      "def load_test_simulation_ids(level, y_test):\n",
+      "    path = DATA_ROOT / f\"level{level}\" / \"test\" / \"simulation_ids.npy\"\n",
+      "    if path.exists():\n",
+      "        return np.load(path, allow_pickle=False)\n",
+      "    # fallback: every simulation has its own unique (Omega_m, sigma_8) pair\n",
+      "    _, ids = np.unique(np.round(y_test, 6), axis=0, return_inverse=True)\n",
+      "    return ids.ravel()\n",
+      "\n",
+      "\n",
+      "def simulation_average(pred, y, sim_ids):\n",
+      "    ids = np.unique(sim_ids)\n",
+      "    pred_sim = np.array([pred[sim_ids == i].mean(axis=0) for i in ids])\n",
+      "    y_sim = np.array([y[sim_ids == i][0] for i in ids])\n",
+      "    return pred_sim, y_sim\n",
+      "\n",
+      "\n",
+      "rows = []\n",
+      "predictions = {}\n",
+      "\n",
+      "for level, (folds, X_test, y_test) in data.items():\n",
+      "    X_tr = np.concatenate([X for X, _ in folds])\n",
+      "    y_tr = np.concatenate([y for _, y in folds])\n",
+      "\n",
+      "    model = make_model(cv[level][\"best_alpha\"]).fit(X_tr, y_tr)\n",
+      "    pred = model.predict(X_test)\n",
+      "    mean_pred = np.tile(y_tr.mean(axis=0), (len(y_test), 1))\n",
+      "    predictions[level] = pred\n",
+      "    np.save(OUT_DIR / f\"test_predictions_level{level}.npy\", pred)\n",
+      "\n",
+      "    sim_ids = load_test_simulation_ids(level, y_test)\n",
+      "    pred_sim, y_sim = simulation_average(pred, y_test, sim_ids)\n",
+      "\n",
+      "    for t, name in enumerate(PARAM_NAMES):\n",
+      "        rows.append({\n",
+      "            \"level\": level,\n",
+      "            \"parameter\": name,\n",
+      "            \"n_train\": len(X_tr),\n",
+      "            \"alpha\": cv[level][\"best_alpha\"][t],\n",
+      "            \"MAE\": mean_absolute_error(y_test[:, t], pred[:, t]),\n",
+      "            \"RMSE\": np.sqrt(mean_squared_error(y_test[:, t], pred[:, t])),\n",
+      "            \"R2\": r2_score(y_test[:, t], pred[:, t]),\n",
+      "            \"sim_MAE\": mean_absolute_error(y_sim[:, t], pred_sim[:, t]),\n",
+      "            \"sim_RMSE\": np.sqrt(mean_squared_error(y_sim[:, t], pred_sim[:, t])),\n",
+      "            \"sim_R2\": r2_score(y_sim[:, t], pred_sim[:, t]),\n",
+      "            \"baseline_RMSE\": np.sqrt(mean_squared_error(y_test[:, t], mean_pred[:, t])),\n",
+      "        })\n",
+      "\n",
+      "print(f\"{'':24} {'---------- per map ----------':>30}   {'------- per simulation -------':>30}\")\n",
+      "print(f\"{'level':>5} {'param':>8} {'alpha':>9} {'MAE':>9} {'RMSE':>9} {'R2':>9}   {'MAE':>9} {'RMSE':>9} {'R2':>9}   {'mean-pred RMSE':>14}\")\n",
+      "for r in rows:\n",
+      "    print(f\"{r['level']:>5} {r['parameter']:>8} {r['alpha']:>9.3g} \"\n",
+      "          f\"{r['MAE']:>9.4f} {r['RMSE']:>9.4f} {r['R2']:>9.3f}   \"\n",
+      "          f\"{r['sim_MAE']:>9.4f} {r['sim_RMSE']:>9.4f} {r['sim_R2']:>9.3f}   {r['baseline_RMSE']:>14.4f}\")\n",
+      "\n",
+      "with open(OUT_DIR / \"ridge_results.csv\", \"w\", newline=\"\") as f:\n",
+      "    writer = csv.DictWriter(f, fieldnames=rows[0].keys())\n",
+      "    writer.writeheader()\n",
+      "    writer.writerows(rows)\n",
+      "print(f\"\\nSaved to {OUT_DIR / 'ridge_results.csv'}\")"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "                          ---------- per map ----------   ------- per simulation -------\n",
+          "level    param     alpha       MAE      RMSE        R2         MAE      RMSE        R2   mean-pred RMSE\n",
+          "    1  Omega_m       100    0.1124    0.1266     0.287      0.1116    0.1229     0.328           0.1500\n",
+          "    1  sigma_8       100    0.0924    0.1072    -0.037      0.0876    0.0996     0.106           0.1054\n",
+          "    2  Omega_m       100    0.0735    0.0869     0.414      0.0678    0.0788     0.518           0.1138\n",
+          "    2  sigma_8       178    0.0744    0.0934     0.279      0.0690    0.0864     0.383           0.1102\n",
+          "    3  Omega_m       178    0.0747    0.0925     0.391      0.0675    0.0827     0.513           0.1198\n",
+          "    3  sigma_8       316    0.0832    0.1000     0.196      0.0780    0.0940     0.289           0.1124\n",
+          "\n",
+          "Saved to results\\ridge\\ridge_results.csv\n"
+        ],
+        "data": {}
+      }
+    ]
+  },
+  {
+    "cell": 11,
+    "cell_type": "code",
+    "source": [
+      "fig, axes = plt.subplots(len(LEVELS), 2, figsize=(10, 4.5 * len(LEVELS)))\n",
+      "for row, level in enumerate(LEVELS):\n",
+      "    y_test = data[level][2]\n",
+      "    pred = predictions[level]\n",
+      "    for t in range(2):\n",
+      "        ax = axes[row, t]\n",
+      "        lo, hi = y_test[:, t].min(), y_test[:, t].max()\n",
+      "        ax.scatter(y_test[:, t], pred[:, t], s=6, alpha=0.4)\n",
+      "        ax.plot([lo, hi], [lo, hi], \"k--\", lw=1, label=\"perfect prediction\")\n",
+      "        r = next(r for r in rows if r[\"level\"] == level and r[\"parameter\"] == PARAM_NAMES[t])\n",
+      "        ax.set_title(f\"Level {level}: {PARAM_TEX[t]}   RMSE={r['RMSE']:.4f}, MAE={r['MAE']:.4f}\")\n",
+      "        ax.set_xlabel(f\"true {PARAM_TEX[t]}\")\n",
+      "        ax.set_ylabel(f\"predicted {PARAM_TEX[t]}\")\n",
+      "        ax.legend(loc=\"upper left\")\n",
+      "plt.tight_layout()\n",
+      "plt.savefig(OUT_DIR / \"pred_vs_true.png\", dpi=150)\n",
+      "plt.show()"
+    ],
+    "outputs": [
+      {
+        "metadata": {},
+        "output_type": "display_data",
+        "data": {
+          "text/plain": [
+            "<Figure size 1000x1350 with 6 Axes>"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "cell": 12,
+    "cell_type": "code",
+    "source": [
+      "fig, axes = plt.subplots(1, 2, figsize=(11, 4))\n",
+      "for t, ax in enumerate(axes):\n",
+      "    sel = [r for r in rows if r[\"parameter\"] == PARAM_NAMES[t]]\n",
+      "    n = [r[\"n_train\"] for r in sel]\n",
+      "    ax.plot(n, [r[\"RMSE\"] for r in sel], \"o-\", label=\"Ridge\")\n",
+      "    ax.plot(n, [r[\"baseline_RMSE\"] for r in sel], \"s--\", label=\"predict training mean\")\n",
+      "    ax.set_xscale(\"log\")\n",
+      "    ax.set_xlabel(\"number of training samples\")\n",
+      "    ax.set_ylabel(\"test RMSE\")\n",
+      "    ax.set_title(f\"Effect of dataset size: {PARAM_TEX[t]}\")\n",
+      "    ax.legend()\n",
+      "plt.tight_layout()\n",
+      "plt.savefig(OUT_DIR / \"rmse_vs_train_size.png\", dpi=150)\n",
+      "plt.show()"
+    ],
+    "outputs": [
+      {
+        "metadata": {},
+        "output_type": "display_data",
+        "data": {
+          "text/plain": [
+            "<Figure size 1100x400 with 2 Axes>"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "cell": 13,
+    "cell_type": "markdown",
+    "source": [
+      "## Outputs\n",
+      "\n",
+      "All saved in `results/ridge/`:\n",
+      "- `ridge_results.csv`: test MAE, RMSE, R² (per map and per simulation) and chosen α for every level and parameter\n",
+      "- `test_predictions_level{1,2,3}.npy`: test-set predictions, columns (Ωm, σ8), for combined comparison plots\n",
+      "- `cv_curves.png`, `pred_vs_true.png`, `rmse_vs_train_size.png`"
+    ],
+    "outputs": []
+  }
+]

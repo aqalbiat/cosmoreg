@@ -1,0 +1,27 @@
+# Default CAMELS CMD source for this project.
+suite: IllustrisTNG
+simulation_set: LH
+redshift: "0.00"
+field: Mtot
+maps_url: "https://users.flatironinstitute.org/~fvillaescusa/priv/DEPnzxoWlaTQ6CjrXqsm0vYi8L7Jy/CMD/2D_maps/data/IllustrisTNG/Maps_Mtot_IllustrisTNG_LH_z=0.00.npy"
+params_url: "https://users.flatironinstitute.org/~fvillaescusa/priv/DEPnzxoWlaTQ6CjrXqsm0vYi8L7Jy/CMD/2D_maps/data/IllustrisTNG/params_LH_IllustrisTNG.txt"
+local_maps_path:
+local_params_path:
+raw_data_dir: raw
+maps_output_dir: maps2d
+spectra_output_dir: powerspectrum
+metadata_dir: metadata
+box_size_mpc_h: 25.0
+seed: 42
+maps_per_simulation: 15
+level_simulation_counts: [67, 333, 600]
+test_fraction: 0.2
+n_folds: 5
+n_power_bins: 50
+batch_size: 64
+log_epsilon: 1.0e-30
+overwrite: false
+expected_map_shape: [256, 256]
+expected_dtype: float32
+expected_parameter_count: 6
+parameter_columns: [Omega_m, sigma_8, A_SN1, A_AGN1, A_SN2, A_AGN2]

@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "engine": "XeLaTeX in WSL",
+  "pages": 32,
+  "pdf_bytes": 2567722,
+  "pdf_sha256": "fdd9e366182056807631935b4fa2ac30e51e8f3cd24e011c0eeca31843e08f48",
+  "findings": {
+    "errors": [],
+    "missing_characters": [],
+    "unresolved_references": [],
+    "overfull_boxes": [],
+    "warnings": [],
+    "underfull_boxes": []
+  }
+}

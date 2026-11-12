@@ -1,0 +1,35 @@
+[
+  {
+    "cell": 0,
+    "cell_type": "code",
+    "source": [
+      "from fetch import Get2dMapTrainFold, Get2dMapTestData, GetSpectrumTrainFold, GetSpectrumTestData\n",
+      "\n",
+      "level = 1\n",
+      "fold = 1\n",
+      "\n",
+      "map_train, map_train_labels = Get2dMapTrainFold(level, fold)\n",
+      "map_test, map_test_labels = Get2dMapTestData(level)\n",
+      "spectrum_train, spectrum_train_labels = GetSpectrumTrainFold(level, fold)\n",
+      "spectrum_test, spectrum_test_labels = GetSpectrumTestData(level)\n",
+      "\n",
+      "print('2D map train fold:', map_train.shape, map_train_labels.shape)\n",
+      "print('2D map test data:', map_test.shape, map_test_labels.shape)\n",
+      "print('Spectrum train fold:', spectrum_train.shape, spectrum_train_labels.shape)\n",
+      "print('Spectrum test data:', spectrum_test.shape, spectrum_test_labels.shape)\n"
+    ],
+    "outputs": [
+      {
+        "name": "stdout",
+        "output_type": "stream",
+        "text": [
+          "2D map train fold: (165, 256, 256) (165, 2)\n",
+          "2D map test data: (195, 256, 256) (195, 2)\n",
+          "Spectrum train fold: (165, 50) (165, 2)\n",
+          "Spectrum test data: (195, 50) (195, 2)\n"
+        ],
+        "data": {}
+      }
+    ]
+  }
+]

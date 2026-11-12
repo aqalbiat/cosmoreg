@@ -1,0 +1,21 @@
+\begingroup\footnotesize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.05}
+\begin{longtable}{lrrrrrrr}
+\caption{All MLP configuration summaries. RMSE is pooled by simulation; SD is the fold RMSE standard deviation.}\label{tab:mlp-cv}\\
+\toprule
+Level & Configuration & Score & RMSE $\Omega_m$ & RMSE $\sigma_8$ & SD $\Omega_m$ & SD $\sigma_8$ & Best epochs \\
+\midrule
+\endfirsthead
+\toprule
+Level & Configuration & Score & RMSE $\Omega_m$ & RMSE $\sigma_8$ & SD $\Omega_m$ & SD $\sigma_8$ & Best epochs \\
+\midrule\endhead
+\bottomrule\endfoot
+1 & original & 0.805545 & 0.0892 & 0.0900 & 0.0180 & 0.0188 & 9,17,18,11,20 \\
+1 & larger & 0.795203 & 0.0869 & 0.0901 & 0.0175 & 0.0198 & 3,6,18,11,19 \\
+1 & stronger\_decay & 0.806355 & 0.0893 & 0.0901 & 0.0179 & 0.0188 & 9,17,18,11,20 \\
+2 & original & 0.693320 & 0.0782 & 0.0806 & 0.0056 & 0.0076 & 13,13,19,12,13 \\
+2 & larger & 0.693837 & 0.0783 & 0.0806 & 0.0058 & 0.0080 & 17,13,17,5,13 \\
+2 & stronger\_decay & 0.693170 & 0.0781 & 0.0806 & 0.0059 & 0.0075 & 13,13,19,11,13 \\
+3 & original & 0.705331 & 0.0797 & 0.0856 & 0.0039 & 0.0043 & 12,18,16,9,17 \\
+3 & larger & 0.699957 & 0.0789 & 0.0852 & 0.0050 & 0.0037 & 12,16,9,4,17 \\
+3 & stronger\_decay & 0.705078 & 0.0796 & 0.0857 & 0.0034 & 0.0044 & 12,18,16,9,19 \\
+\end{longtable}\endgroup
