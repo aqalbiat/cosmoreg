@@ -14,6 +14,7 @@ maps2d/**/map_ids.npy
 maps2d/**/manifest.json
 powerspectrum/**/*.npy
 powerspectrum/**/manifest.json
+powerspectrum2/
 *.download
 *.partial/
 augmented_maps2d/
