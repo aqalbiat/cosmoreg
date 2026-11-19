@@ -17,3 +17,4 @@ powerspectrum/**/manifest.json
 *.download
 *.partial/
 augmented_maps2d/
+preferences/
