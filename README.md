@@ -64,6 +64,24 @@ Audit paired outputs:
 python -m camels_pipeline.cli audit --maps-root maps2d --spectra-root powerspectrum
 ```
 
+Recompute spectra with other vector sizes from the existing prepared maps:
+
+```bash
+python -m camels_pipeline.recompute --dimensions 10 30 70 90
+```
+
+This uses the same spectrum functions and reference settings as the original
+D=50 export. Outputs go to `powerspectrum2/D={N}/level{1,2,3}/`, retaining each
+fold/test group and the exact labels, simulation IDs, map IDs, and row order.
+Each leaf contains linear/log spectra, Fourier geometry arrays, and a manifest.
+The existing maps and D=50 spectra are left intact. Existing destination files
+are refused; use `--output-root` for a separate rerun. Each dimension can be
+audited with, for example:
+
+```bash
+python -m camels_pipeline.cli audit --maps-root maps2d --spectra-root "powerspectrum2/D=10"
+```
+
 Run tests:
 
 ```bash
