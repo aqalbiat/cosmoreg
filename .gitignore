@@ -15,6 +15,7 @@ maps2d/**/manifest.json
 powerspectrum/**/*.npy
 powerspectrum/**/manifest.json
 powerspectrum2/
+autoencoders_hidden/
 *.download
 *.partial/
 augmented_maps2d/
