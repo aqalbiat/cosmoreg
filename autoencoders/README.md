@@ -8,6 +8,7 @@ New-Item -ItemType Directory -Force autoencoders/runs
 python -m pytest autoencoders/test_pipeline.py --basetemp autoencoders/runs/test-fixtures -o cache_dir=autoencoders/.pytest_cache -q
 python -u -m autoencoders.experiment
 python -m autoencoders.verify
+python -m autoencoders.summarize
 ```
 
 The default experiment runs all three existing levels independently, first D=30
@@ -69,6 +70,8 @@ autoencoders/runs/sweep30/
   levelN/D=N/cross_validation.json
   levelN/D=N/final/             # final encoder, latent scaler/Ridge, test scores
   REPORT.md                    # CV comparison and both test-target errors
+  INTERPRETATION.md            # CV-selected test summary and baseline comparison
+  summary.json                 # independently recomputed development-only baseline
   results.json                 # full machine-readable results
   completed.json               # created only after all evaluations finish
 autoencoders_hidden/sweep30/D=N/levelN/
@@ -107,3 +110,15 @@ development-only latent scaling, and recomputed test metrics. Use
 training finishes. Numerical experiment settings are recorded in
 `experiment.json`; the executed run also has `environment.json` for library and
 GPU versions, plus `global_split_audit.json` for cross-level simulation checks.
+
+After the audit passes, `python -m autoencoders.summarize` reproduces the
+training-mean baseline using development labels only, checks the earlier saved
+baseline when present, and writes `INTERPRETATION.md` and `summary.json`. It also
+links that interpretation from `REPORT.md`. The summary identifies the winners
+using the locked CV selection and reports their original-unit test errors;
+all dimensions remain in the full report. It does not retrain or reevaluate
+test maps. It also records final development reconstruction loss and latent
+variation, flagging refits whose normalized reconstruction MSE stays at least
+0.99 (the training pixel-mean reference is 1). These reporting diagnostics do
+not change the locked settings or remove weak fits. Rerun it after a driver
+resume, which regenerates `REPORT.md`.
