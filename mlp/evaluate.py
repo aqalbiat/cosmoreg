@@ -64,6 +64,7 @@ def evaluate_test_model(checkpoint_path, spectra_root):
     checkpoint_hash = sha256(checkpoint_path.read_bytes()).hexdigest()
     saved = load_final_model(checkpoint_path)
     level = saved["settings"]["level"]
+    model = saved["model"]
     if saved["target_names"] != ["Omega_m", "sigma_8"]:
         raise ValueError("Unexpected target order in checkpoint.")
     if saved["settings"]["input_representation"] != "log_power_spectra.npy":
@@ -73,8 +74,10 @@ def evaluate_test_model(checkpoint_path, spectra_root):
     X = np.load(leaf / "log_power_spectra.npy", allow_pickle=False)
     y = np.load(leaf / "labels.npy", allow_pickle=False)
     ids = np.load(leaf / "simulation_ids.npy", allow_pickle=False)
-    if ids.ndim != 1 or X.shape != (len(ids), 50) or y.shape != (len(ids), 2):
-        raise ValueError("Invalid test array shapes.")
+    if ids.ndim != 1 or X.shape != (len(ids), model.input_dim) or y.shape != (len(ids), 2):
+        raise ValueError(
+            f"Expected {model.input_dim} test features, two targets, and one simulation ID per map."
+        )
     if len(ids) == 0 or not np.isfinite(X).all() or not np.isfinite(y).all():
         raise ValueError("Test data must be nonempty and finite.")
     if np.intersect1d(ids, saved["training_simulation_ids"]).size:
@@ -87,7 +90,6 @@ def evaluate_test_model(checkpoint_path, spectra_root):
     scalers = saved["scalers"]
     X_scaled = data.transform_features(X, scalers["feature_mean"], scalers["feature_std"])
     y_scaled = data.transform_targets(y, scalers["target_mean"], scalers["target_std"])
-    model = saved["model"]
     model.eval()
     weights_before = {name: value.clone() for name, value in model.state_dict().items()}
     with torch.no_grad():

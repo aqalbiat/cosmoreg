@@ -1,0 +1,770 @@
+[
+  {
+    "level": 1,
+    "bins": 10,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "larger",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          64,
+          32
+        ],
+        "weight_decay": 0.0001
+      },
+      "source": "mlp/level1/level1_config_comparison.json",
+      "source_sha256": "02a594600175cb9b68915883dabb39d9c86e61b01f3db78955c8e447d7541c53"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 12,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        64,
+        32
+      ],
+      "weight_decay": 0.0001
+    },
+    "development_best_epochs": [
+      6,
+      8,
+      16,
+      12,
+      15
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 54,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.08969889861228432,
+        0.09004280411233351
+      ],
+      "mae": [
+        0.07604309840610733,
+        0.07571238389721623
+      ],
+      "baseline_rmse": [
+        0.10869996439984031,
+        0.11388533760009206
+      ],
+      "baseline_mae": [
+        0.09164528424541156,
+        0.09727344358408893
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "bins": 30,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "larger",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          64,
+          32
+        ],
+        "weight_decay": 0.0001
+      },
+      "source": "mlp/level1/level1_config_comparison.json",
+      "source_sha256": "02a594600175cb9b68915883dabb39d9c86e61b01f3db78955c8e447d7541c53"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 11,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        64,
+        32
+      ],
+      "weight_decay": 0.0001
+    },
+    "development_best_epochs": [
+      6,
+      6,
+      19,
+      11,
+      19
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 54,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.08835181024241327,
+        0.08930195426931282
+      ],
+      "mae": [
+        0.07538797154470726,
+        0.07480930543884083
+      ],
+      "baseline_rmse": [
+        0.10869996439984031,
+        0.11388533760009206
+      ],
+      "baseline_mae": [
+        0.09164528424541156,
+        0.09727344358408893
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "bins": 70,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "larger",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          64,
+          32
+        ],
+        "weight_decay": 0.0001
+      },
+      "source": "mlp/level1/level1_config_comparison.json",
+      "source_sha256": "02a594600175cb9b68915883dabb39d9c86e61b01f3db78955c8e447d7541c53"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 11,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        64,
+        32
+      ],
+      "weight_decay": 0.0001
+    },
+    "development_best_epochs": [
+      6,
+      7,
+      18,
+      11,
+      19
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 54,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.08705639530241464,
+        0.0890158843230928
+      ],
+      "mae": [
+        0.07372079154959431,
+        0.07488775701710472
+      ],
+      "baseline_rmse": [
+        0.10869996439984031,
+        0.11388533760009206
+      ],
+      "baseline_mae": [
+        0.09164528424541156,
+        0.09727344358408893
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "bins": 90,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "larger",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          64,
+          32
+        ],
+        "weight_decay": 0.0001
+      },
+      "source": "mlp/level1/level1_config_comparison.json",
+      "source_sha256": "02a594600175cb9b68915883dabb39d9c86e61b01f3db78955c8e447d7541c53"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 11,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        64,
+        32
+      ],
+      "weight_decay": 0.0001
+    },
+    "development_best_epochs": [
+      2,
+      6,
+      18,
+      11,
+      19
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 54,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.08675017703060209,
+        0.0883042991157782
+      ],
+      "mae": [
+        0.07386458099440292,
+        0.07397486848963632
+      ],
+      "baseline_rmse": [
+        0.10869996439984031,
+        0.11388533760009206
+      ],
+      "baseline_mae": [
+        0.09164528424541156,
+        0.09727344358408893
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "bins": 10,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "stronger_decay",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          32,
+          16
+        ],
+        "weight_decay": 0.01
+      },
+      "source": "mlp/level2/level2_config_comparison.json",
+      "source_sha256": "2ee31535b94db34e56add4fec024eb2bd9316a5f9f2403849517b723369044b6"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 17,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        32,
+        16
+      ],
+      "weight_decay": 0.01
+    },
+    "development_best_epochs": [
+      5,
+      17,
+      19,
+      20,
+      16
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 266,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.08085717171203234,
+        0.08204497081060276
+      ],
+      "mae": [
+        0.06905577193133365,
+        0.06847025001687664
+      ],
+      "baseline_rmse": [
+        0.1121128217547509,
+        0.11692516943741574
+      ],
+      "baseline_mae": [
+        0.09672930733041656,
+        0.10062391907536894
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "bins": 30,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "stronger_decay",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          32,
+          16
+        ],
+        "weight_decay": 0.01
+      },
+      "source": "mlp/level2/level2_config_comparison.json",
+      "source_sha256": "2ee31535b94db34e56add4fec024eb2bd9316a5f9f2403849517b723369044b6"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 18,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        32,
+        16
+      ],
+      "weight_decay": 0.01
+    },
+    "development_best_epochs": [
+      5,
+      20,
+      19,
+      18,
+      13
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 266,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.07934735742656897,
+        0.08035040526891653
+      ],
+      "mae": [
+        0.06790796280803538,
+        0.0665880405112989
+      ],
+      "baseline_rmse": [
+        0.1121128217547509,
+        0.11692516943741574
+      ],
+      "baseline_mae": [
+        0.09672930733041656,
+        0.10062391907536894
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "bins": 70,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "stronger_decay",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          32,
+          16
+        ],
+        "weight_decay": 0.01
+      },
+      "source": "mlp/level2/level2_config_comparison.json",
+      "source_sha256": "2ee31535b94db34e56add4fec024eb2bd9316a5f9f2403849517b723369044b6"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 15,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        32,
+        16
+      ],
+      "weight_decay": 0.01
+    },
+    "development_best_epochs": [
+      13,
+      19,
+      15,
+      12,
+      19
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 266,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.07809244984493591,
+        0.08078762828676243
+      ],
+      "mae": [
+        0.06660887741840872,
+        0.06774079719824451
+      ],
+      "baseline_rmse": [
+        0.1121128217547509,
+        0.11692516943741574
+      ],
+      "baseline_mae": [
+        0.09672930733041656,
+        0.10062391907536894
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "bins": 90,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "stronger_decay",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          32,
+          16
+        ],
+        "weight_decay": 0.01
+      },
+      "source": "mlp/level2/level2_config_comparison.json",
+      "source_sha256": "2ee31535b94db34e56add4fec024eb2bd9316a5f9f2403849517b723369044b6"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 19,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        32,
+        16
+      ],
+      "weight_decay": 0.01
+    },
+    "development_best_epochs": [
+      17,
+      20,
+      15,
+      20,
+      19
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 266,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.07854596474413607,
+        0.08074608294075146
+      ],
+      "mae": [
+        0.06705991723539687,
+        0.06744244061690524
+      ],
+      "baseline_rmse": [
+        0.1121128217547509,
+        0.11692516943741574
+      ],
+      "baseline_mae": [
+        0.09672930733041656,
+        0.10062391907536894
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "bins": 10,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "larger",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          64,
+          32
+        ],
+        "weight_decay": 0.0001
+      },
+      "source": "mlp/level3/level3_config_comparison.json",
+      "source_sha256": "10c03470419e559b7d05c58edccdcdcafaffadcd5aa184a98a56c30183b9da54"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 18,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        64,
+        32
+      ],
+      "weight_decay": 0.0001
+    },
+    "development_best_epochs": [
+      18,
+      18,
+      11,
+      9,
+      19
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 480,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.07984682090754908,
+        0.08502865701375296
+      ],
+      "mae": [
+        0.06717443913221359,
+        0.0719674825668335
+      ],
+      "baseline_rmse": [
+        0.11728086090480745,
+        0.11709818456370069
+      ],
+      "baseline_mae": [
+        0.10162298679351807,
+        0.10225498676300049
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "bins": 30,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "larger",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          64,
+          32
+        ],
+        "weight_decay": 0.0001
+      },
+      "source": "mlp/level3/level3_config_comparison.json",
+      "source_sha256": "10c03470419e559b7d05c58edccdcdcafaffadcd5aa184a98a56c30183b9da54"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 11,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        64,
+        32
+      ],
+      "weight_decay": 0.0001
+    },
+    "development_best_epochs": [
+      12,
+      16,
+      9,
+      9,
+      11
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 480,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.07864505528492512,
+        0.08464562562357131
+      ],
+      "mae": [
+        0.06612831503152847,
+        0.07150780260562897
+      ],
+      "baseline_rmse": [
+        0.11728086090480745,
+        0.11709818456370069
+      ],
+      "baseline_mae": [
+        0.10162298679351807,
+        0.10225498676300049
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "bins": 70,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "larger",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          64,
+          32
+        ],
+        "weight_decay": 0.0001
+      },
+      "source": "mlp/level3/level3_config_comparison.json",
+      "source_sha256": "10c03470419e559b7d05c58edccdcdcafaffadcd5aa184a98a56c30183b9da54"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 11,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        64,
+        32
+      ],
+      "weight_decay": 0.0001
+    },
+    "development_best_epochs": [
+      12,
+      2,
+      16,
+      4,
+      11
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 480,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.07932250989712378,
+        0.08531660306761214
+      ],
+      "mae": [
+        0.06678600311279297,
+        0.0722746267914772
+      ],
+      "baseline_rmse": [
+        0.11728086090480745,
+        0.11709818456370069
+      ],
+      "baseline_mae": [
+        0.10162298679351807,
+        0.10225498676300049
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "bins": 90,
+    "target_names": [
+      "Omega_m",
+      "sigma_8"
+    ],
+    "configuration": {
+      "name": "larger",
+      "settings": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "epochs": 20,
+        "seed": 42,
+        "shuffle_seed": 42,
+        "hidden_dims": [
+          64,
+          32
+        ],
+        "weight_decay": 0.0001
+      },
+      "source": "mlp/level3/level3_config_comparison.json",
+      "source_sha256": "10c03470419e559b7d05c58edccdcdcafaffadcd5aa184a98a56c30183b9da54"
+    },
+    "final_settings": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "epochs": 9,
+      "seed": 42,
+      "shuffle_seed": 42,
+      "hidden_dims": [
+        64,
+        32
+      ],
+      "weight_decay": 0.0001
+    },
+    "development_best_epochs": [
+      12,
+      2,
+      9,
+      9,
+      17
+    ],
+    "epoch_selection": "median best epoch across five development folds",
+    "validation_simulations": 480,
+    "pooled_validation_simulation_metrics": {
+      "rmse": [
+        0.07876932283653422,
+        0.08521770503967037
+      ],
+      "mae": [
+        0.06627063378691674,
+        0.07215431779623031
+      ],
+      "baseline_rmse": [
+        0.11728086090480745,
+        0.11709818456370069
+      ],
+      "baseline_mae": [
+        0.10162298679351807,
+        0.10225498676300049
+      ]
+    }
+  }
+]
