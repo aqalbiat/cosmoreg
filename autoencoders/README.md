@@ -122,3 +122,23 @@ variation, flagging refits whose normalized reconstruction MSE stays at least
 0.99 (the training pixel-mean reference is 1). These reporting diagnostics do
 not change the locked settings or remove weak fits. Rerun it after a driver
 resume, which regenerates `REPORT.md`.
+
+Export graphs from the completed, audited run without retraining:
+
+```powershell
+python -m autoencoders.plot_results
+```
+
+The [figure index](results/README.md) links PNG and PDF exports under
+`autoencoders/results/`, with all figures together in `all_figures.pdf`.
+Figures cover CV selection, Ridge alpha, baseline comparisons, all test
+errors, selected-model predictions and residuals, reconstruction quality,
+all CV/refit learning curves, training budgets, and fixed reconstruction
+examples. The weak level-3 D=70 refit is explicitly retained and illustrated.
+CSV tables and a hash manifest accompany the figures. Simulation plots
+average saved map predictions by simulation ID; they do not refit models.
+The exporter checks saved metrics, source identities and locked selections,
+and needs the original local run, latent exports and map arrays. Options
+`--run-root`, `--output-root`, and `--dpi` select another run, destination, or
+raster resolution. Exported figures are shareable; training artifacts remain
+under their existing ignore rules.
