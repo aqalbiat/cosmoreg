@@ -34,6 +34,11 @@ def run_experiment(
             spectra_root, level, validation_fold
         )
     )
+    if X_train.ndim != 2 or X_train.shape[1] == 0:
+        raise ValueError("Expected a two-dimensional training feature array with at least one bin.")
+    input_dim = X_train.shape[1]
+    if X_val.ndim != 2 or X_val.shape[1] != input_dim:
+        raise ValueError(f"Validation spectra must have the same {input_dim} bins as training.")
 
     # Keep related maps from one simulation in the same split.
     assert np.intersect1d(ids_train, ids_val).size == 0, (
@@ -75,7 +80,7 @@ def run_experiment(
 
     # Start each experiment with fresh weights and optimizer state.
     torch.manual_seed(seed)
-    model = SpectrumMLP(hidden_dims=hidden_dims)
+    model = SpectrumMLP(hidden_dims=hidden_dims, input_dim=input_dim)
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.AdamW(
         model.parameters(),
@@ -223,6 +228,7 @@ def run_experiment(
         "level": level,
         "validation_fold": validation_fold,
         "settings": {
+            "input_dim": input_dim,
             "hidden_dims": list(hidden_dims),
             "learning_rate": learning_rate,
             "weight_decay": weight_decay,

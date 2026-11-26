@@ -1,0 +1,86 @@
+{
+  "created_utc": "2026-11-19T13:35:30+00:00",
+  "leaves": {
+    "level1\\fold1": {
+      "rows": 165,
+      "simulations": 11
+    },
+    "level1\\fold2": {
+      "rows": 165,
+      "simulations": 11
+    },
+    "level1\\fold3": {
+      "rows": 165,
+      "simulations": 11
+    },
+    "level1\\fold4": {
+      "rows": 165,
+      "simulations": 11
+    },
+    "level1\\fold5": {
+      "rows": 150,
+      "simulations": 10
+    },
+    "level1\\test": {
+      "rows": 195,
+      "simulations": 13
+    },
+    "level2\\fold1": {
+      "rows": 810,
+      "simulations": 54
+    },
+    "level2\\fold2": {
+      "rows": 795,
+      "simulations": 53
+    },
+    "level2\\fold3": {
+      "rows": 795,
+      "simulations": 53
+    },
+    "level2\\fold4": {
+      "rows": 795,
+      "simulations": 53
+    },
+    "level2\\fold5": {
+      "rows": 795,
+      "simulations": 53
+    },
+    "level2\\test": {
+      "rows": 1005,
+      "simulations": 67
+    },
+    "level3\\fold1": {
+      "rows": 1440,
+      "simulations": 96
+    },
+    "level3\\fold2": {
+      "rows": 1440,
+      "simulations": 96
+    },
+    "level3\\fold3": {
+      "rows": 1440,
+      "simulations": 96
+    },
+    "level3\\fold4": {
+      "rows": 1440,
+      "simulations": 96
+    },
+    "level3\\fold5": {
+      "rows": 1440,
+      "simulations": 96
+    },
+    "level3\\test": {
+      "rows": 1800,
+      "simulations": 120
+    }
+  },
+  "maps_root": "maps2d",
+  "n_power_bins": 70,
+  "note": "Recomputed with camels_pipeline.spectrum; reference splits and row order preserved. Each leaf retains its original source identity and synthetic-data flag.",
+  "reference_spectra_root": "powerspectrum",
+  "software": {
+    "numpy": "2.4.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.0"
+  }
+}

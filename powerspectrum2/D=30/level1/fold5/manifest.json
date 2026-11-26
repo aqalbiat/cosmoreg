@@ -1,0 +1,103 @@
+{
+  "box_size_mpc_h": 25.0,
+  "clipped_log_bins": 0,
+  "config": {
+    "batch_size": 64,
+    "box_size_mpc_h": 25.0,
+    "expected_dtype": "float32",
+    "expected_map_shape": [
+      256,
+      256
+    ],
+    "expected_parameter_count": 6,
+    "field": "Mtot",
+    "level_simulation_counts": [
+      67,
+      333,
+      600
+    ],
+    "local_maps_path": null,
+    "local_params_path": null,
+    "log_epsilon": 1e-30,
+    "maps_output_dir": "maps2d",
+    "maps_per_simulation": 15,
+    "maps_url": "https://users.flatironinstitute.org/~fvillaescusa/priv/DEPnzxoWlaTQ6CjrXqsm0vYi8L7Jy/CMD/2D_maps/data/IllustrisTNG/Maps_Mtot_IllustrisTNG_LH_z=0.00.npy",
+    "metadata_dir": "powerspectrum2\\D=30",
+    "n_folds": 5,
+    "n_power_bins": 30,
+    "overwrite": false,
+    "parameter_columns": [
+      "Omega_m",
+      "sigma_8",
+      "A_SN1",
+      "A_AGN1",
+      "A_SN2",
+      "A_AGN2"
+    ],
+    "params_url": "https://users.flatironinstitute.org/~fvillaescusa/priv/DEPnzxoWlaTQ6CjrXqsm0vYi8L7Jy/CMD/2D_maps/data/IllustrisTNG/params_LH_IllustrisTNG.txt",
+    "raw_data_dir": "raw",
+    "redshift": "0.00",
+    "seed": 42,
+    "simulation_set": "LH",
+    "spectra_output_dir": "powerspectrum2\\D=30",
+    "suite": "IllustrisTNG",
+    "test_fraction": 0.2
+  },
+  "created_utc": "2026-11-19T13:34:21+00:00",
+  "k_units": "h/Mpc",
+  "labels": [
+    "Omega_m",
+    "sigma_8"
+  ],
+  "log_epsilon": 1e-30,
+  "map_shape": [
+    256,
+    256
+  ],
+  "parameter_columns": [
+    "Omega_m",
+    "sigma_8",
+    "A_SN1",
+    "A_AGN1",
+    "A_SN2",
+    "A_AGN2"
+  ],
+  "power_convention": "delta=rho/mean(rho)-1; P2D=(L^2/N^4)|fft2(delta)|^2; radial mean over full FFT modes excluding DC through axis Nyquist",
+  "power_units": "(Mpc/h)^2 for contrast spectrum",
+  "product": "powerspectrum",
+  "reference_spectrum_manifest": {
+    "official_checksum": null,
+    "path": "powerspectrum\\level1\\fold5\\manifest.json",
+    "retrieved_or_verified_utc": "2026-11-19T13:33:43+00:00",
+    "sha256_computed": "816c062f02faf5ba16dc3126b15c203af89328da482ba139221f35028917ce6f",
+    "size_bytes": 2991,
+    "source_url": null
+  },
+  "row_count": 150,
+  "simulation_count": 10,
+  "software": {
+    "numpy": "2.4.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.0"
+  },
+  "source_identity": {
+    "maps": {
+      "official_checksum": null,
+      "path": "raw\\Maps_Mtot_IllustrisTNG_LH_z=0.00.npy",
+      "retrieved_or_verified_utc": "2026-10-06T19:49:04+00:00",
+      "sha256_computed": "5003be9e6adf36aeb68d9a47f32d477bee880087e49f191df600bdb33391a816",
+      "size_bytes": 3932160128,
+      "source_url": "https://users.flatironinstitute.org/~fvillaescusa/priv/DEPnzxoWlaTQ6CjrXqsm0vYi8L7Jy/CMD/2D_maps/data/IllustrisTNG/Maps_Mtot_IllustrisTNG_LH_z=0.00.npy"
+    },
+    "params": {
+      "official_checksum": null,
+      "path": "raw\\params_LH_IllustrisTNG.txt",
+      "retrieved_or_verified_utc": "2026-10-06T19:49:08+00:00",
+      "sha256_computed": "83ec62cceb81547b8940d8ed77371834171648d5c8e8d99990cf012e71a5b2b8",
+      "size_bytes": 48000,
+      "source_url": "https://users.flatironinstitute.org/~fvillaescusa/priv/DEPnzxoWlaTQ6CjrXqsm0vYi8L7Jy/CMD/2D_maps/data/IllustrisTNG/params_LH_IllustrisTNG.txt"
+    },
+    "synthetic": false
+  },
+  "source_maps_leaf": "maps2d\\level1\\fold5"
+}

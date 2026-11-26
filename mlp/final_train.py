@@ -28,8 +28,9 @@ def train_final_model(
         raise ValueError("learning_rate must be positive and weight_decay nonnegative.")
 
     X, y, ids = data.load_development(spectra_root, level)
-    if X.shape != (len(ids), 50) or y.shape != (len(ids), 2):
-        raise ValueError("Expected 50 input features and two targets per map.")
+    if X.ndim != 2 or X.shape[0] != len(ids) or X.shape[1] == 0 or y.shape != (len(ids), 2):
+        raise ValueError("Expected a log-power spectrum and two targets per map.")
+    input_dim = X.shape[1]
 
     # Fit new scalers using the complete development training set.
     feature_mean, feature_std = data.fit_feature_scaler(X)
@@ -42,7 +43,7 @@ def train_final_model(
     )
 
     torch.manual_seed(seed)
-    model = SpectrumMLP(hidden_dims=hidden_dims)
+    model = SpectrumMLP(hidden_dims=hidden_dims, input_dim=input_dim)
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=learning_rate, weight_decay=weight_decay,
     )
@@ -61,6 +62,7 @@ def train_final_model(
         "model": model,
         "settings": {
             "level": level,
+            "input_dim": input_dim,
             "hidden_dims": list(hidden_dims),
             "epochs": epochs,
             "learning_rate": learning_rate,
@@ -111,7 +113,14 @@ def load_final_model(checkpoint_path):
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
     if checkpoint["format_version"] != 1:
         raise ValueError("Unsupported final-model checkpoint format.")
-    model = SpectrumMLP(hidden_dims=checkpoint["settings"]["hidden_dims"])
+    settings = checkpoint["settings"]
+    # Original checkpoints did not record the input width and always used 50 bins.
+    model = SpectrumMLP(
+        hidden_dims=settings["hidden_dims"], input_dim=settings.get("input_dim", 50),
+    )
+    for name in ("feature_mean", "feature_std"):
+        if checkpoint["scalers"][name].shape != (model.input_dim,):
+            raise ValueError(f"Checkpoint {name} must have {model.input_dim} values.")
     model.load_state_dict(checkpoint["model_state"])
     model.eval()
     return {
